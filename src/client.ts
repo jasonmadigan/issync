@@ -79,17 +79,25 @@ export async function getGraphqlClient(): Promise<typeof graphql> {
 }
 
 export async function getCurrentRepo(): Promise<string> {
+  // try upstream first (for forks), fall back to origin
+  let url: string;
+
   try {
-    const { stdout } = await execAsync('git remote get-url origin');
-    const url = stdout.trim();
-
-    const match = url.match(/github\.com[:/]([^/]+\/[^/.]+)/);
-    if (!match) {
-      throw new Error('could not parse github repo from git remote');
+    const { stdout } = await execAsync('git remote get-url upstream');
+    url = stdout.trim();
+  } catch {
+    try {
+      const { stdout } = await execAsync('git remote get-url origin');
+      url = stdout.trim();
+    } catch (error: any) {
+      throw new Error(`failed to get current repo: ${error.message}`);
     }
-
-    return match[1].replace(/\.git$/, '');
-  } catch (error: any) {
-    throw new Error(`failed to get current repo: ${error.message}`);
   }
+
+  const match = url.match(/github\.com[:/]([^/]+\/[^/.]+)/);
+  if (!match) {
+    throw new Error('could not parse github repo from git remote');
+  }
+
+  return match[1].replace(/\.git$/, '');
 }
