@@ -22,6 +22,10 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasonmadigan/issync"
+  },
   "dependencies": {
     "@octokit/graphql": "^9.0.2",
     "@octokit/rest": "^22.0.0",
