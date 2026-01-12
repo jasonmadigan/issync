@@ -45,7 +45,7 @@ export async function fetchIssues(
       allIssues.push({
         number: issue.number,
         title: issue.title,
-        body: issue.body || '',
+        body: (issue.body || '').trim(),
         state: issue.state as 'open' | 'closed',
         labels: issue.labels.map((l: any) => (typeof l === 'string' ? l : l.name)),
         assignees: issue.assignees?.map((a: any) => a.login) || [],
@@ -53,6 +53,7 @@ export async function fetchIssues(
         created_at: issue.created_at,
         updated_at: issue.updated_at,
         closed_at: issue.closed_at || null,
+        url: issue.html_url,
       });
     }
 
@@ -131,7 +132,7 @@ export async function updateIssue(
 
 export async function createIssue(
   repo: string,
-  issue: Omit<Issue, 'number' | 'created_at' | 'updated_at' | 'closed_at'>
+  issue: Omit<Issue, 'number' | 'created_at' | 'updated_at' | 'closed_at' | 'url'>
 ): Promise<number> {
   const octokit = await getOctokit();
   const [owner, repoName] = repo.split('/');

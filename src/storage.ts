@@ -24,6 +24,7 @@ export async function saveIssue(issue: Issue): Promise<void> {
     created_at: issue.created_at,
     updated_at: issue.updated_at,
     closed_at: issue.closed_at,
+    url: issue.url,
   };
 
   if (issue.project_fields && Object.keys(issue.project_fields).length > 0) {
@@ -52,6 +53,7 @@ export async function loadIssue(number: number): Promise<Issue | null> {
       created_at: data.created_at,
       updated_at: data.updated_at,
       closed_at: data.closed_at || null,
+      url: data.url || '',
     };
 
     if (data.project_fields) {

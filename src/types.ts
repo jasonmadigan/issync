@@ -9,6 +9,7 @@ export interface Issue {
   created_at: string;
   updated_at: string;
   closed_at: string | null;
+  url: string;
   project_fields?: Record<string, ProjectFieldValue>;
 }
 

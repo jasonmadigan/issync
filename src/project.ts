@@ -258,6 +258,14 @@ export async function getProjectItemsForIssues(
                       }
                     }
                   }
+                  ... on ProjectV2ItemFieldIterationValue {
+                    title
+                    field {
+                      ... on ProjectV2IterationField {
+                        name
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -297,7 +305,7 @@ export async function getProjectItemsForIssues(
               if (!fieldValue.field?.name) continue;
 
               const fieldName = fieldValue.field.name;
-              const value = fieldValue.name || fieldValue.text || fieldValue.date || fieldValue.number || null;
+              const value = fieldValue.name || fieldValue.text || fieldValue.date || fieldValue.number || fieldValue.title || null;
               converted[fieldName] = value;
             }
           }
@@ -322,12 +330,18 @@ export async function getProjectItems(projectNumber: number, owner: string, repo
 export async function getProjectItemForIssue(
   projectNumber: number,
   owner: string,
+  repoOwner: string,
+  repoName: string,
   issueNumber: number
 ): Promise<ProjectItem | null> {
-  // note: this is inefficient - sync.ts should call getProjectItems once
-  // and then search locally rather than calling this for each issue
-  const items = await getProjectItems(projectNumber, owner);
-  return items.find(item => item.content?.number === issueNumber) || null;
+  const itemsMap = await getProjectItemsForIssues(
+    projectNumber,
+    owner,
+    repoOwner,
+    repoName,
+    [issueNumber]
+  );
+  return itemsMap.get(issueNumber) || null;
 }
 
 export async function updateProjectField(

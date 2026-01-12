@@ -138,7 +138,7 @@ export async function syncUp(force: boolean = false, dryRun: boolean = false, sy
   const state = await loadSyncState();
 
   // auto-detect or load project config
-  const [owner] = repo.split('/');
+  const [owner, repoName] = repo.split('/');
 
   // load project data if --projects flag is set
   let projectFields = null;
@@ -229,6 +229,8 @@ export async function syncUp(force: boolean = false, dryRun: boolean = false, sy
       const remoteProjectItem = await getProjectItemForIssue(
         projectConfig!.project_number!,
         projectConfig!.owner!,
+        owner,
+        repoName,
         local.number
       );
 
@@ -244,13 +246,13 @@ export async function syncUp(force: boolean = false, dryRun: boolean = false, sy
 
           if (JSON.stringify(localValue) !== JSON.stringify(remoteValue)) {
             if (dryRun) {
-              console.log(`  would update project field "${fieldName}": ${remoteValue} -> ${localValue}`);
+              console.log(`would update issue #${local.number} project field "${fieldName}": ${remoteValue} -> ${localValue}`);
             } else {
               try {
                 await updateProjectField(projectId, syncInfo.project_item_id, field.id, field, localValue);
-                console.log(`  updated project field "${fieldName}"`);
+                console.log(`updated issue #${local.number} project field "${fieldName}"`);
               } catch (error) {
-                console.warn(`  warning: failed to update project field "${fieldName}": ${error}`);
+                console.warn(`warning: failed to update issue #${local.number} project field "${fieldName}": ${error}`);
               }
             }
           }
